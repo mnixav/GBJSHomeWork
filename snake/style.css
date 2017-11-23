@@ -1,0 +1,19 @@
+div {
+    height: 30px;
+    width: 30px;
+    border: 1px solid black;
+    display: inline-block;
+    margin: 1px;
+}
+
+article {
+    border: 1px solid black;
+    margin: auto;
+    padding: 10px;
+}
+
+h1 {
+    margin: auto;
+    width: 500px;
+    text-align: center;
+}
