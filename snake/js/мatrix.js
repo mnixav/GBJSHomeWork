@@ -1,5 +1,3 @@
-'use strict';
-
 class Matrix {
 
     constructor (matrixSizeX, matrixSizeY)  {
@@ -23,13 +21,13 @@ class Matrix {
         }
         document.body.innerHTML = '<h1 id="h1">Поймайте красный квадрат</h1><article id="article">' + body + '</article>';
 
-        document.getElementById('article').style.width = (34 * this.matrixSizeX) + 'px';
+        $('#article').css({width: (34 * this.matrixSizeX) + 'px'});
 
         const self = this;
 
         function drawWall(y, x, wallIsVertical) {
             while ((wallIsVertical? y : x) <= (wallIsVertical? self.matrixSizeY : self.matrixSizeX)) {
-                Matrix.getDiv(y, x).style.backgroundColor = '#e4d7e5';
+                Matrix.setDivColor(y, x, 'wall');
                 wallIsVertical? y++ : x++;
             }
         }
@@ -38,47 +36,44 @@ class Matrix {
         drawWall(1, 1, true);
         drawWall(this.matrixSizeY, 1, false);
         drawWall(1, this.matrixSizeX, true);
-
-
-
-
     }
 
     static getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    static getDiv(row, column) {
-        return document.getElementById('row' + row + 'Column' + column);
+    static setDivColor(row, column, className) {
+        $('#row' + row + 'Column' + column).addClass(className);
+    }
+
+    static hasDivColor(row, column, className) {
+        return $('#row' + row + 'Column' + column).hasClass(className);
     }
 
     setPlayerSquare() {
-        const div = Matrix.getDiv(this.squarePositionY, this.squarePositionX);
-        div.style.backgroundColor = 'black';
+        Matrix.setDivColor(this.squarePositionY, this.squarePositionX, 'player');
     }
 
 
     setFinishSquare() {
-        const x = Matrix.getRandomInt(2, this.matrixSizeX - 1);
-        const y = Matrix.getRandomInt(2, this.matrixSizeY - 1);
+        let x = Matrix.getRandomInt(2, this.matrixSizeX - 1);
+        let y = Matrix.getRandomInt(2, this.matrixSizeY - 1);
 
-        if (x === this.squarePositionX && y === this.squarePositionY) {
+        if (Matrix.hasDivColor(y, x, 'player') || Matrix.hasDivColor(y, x, 'wall')) {
             this.setFinishSquare();
         } else {
-            const div = Matrix.getDiv(x, y);
-            div.style.backgroundColor = 'red';
+            Matrix.setDivColor(y, x, 'finish');
         }
     }
 
     setWallSquare() {
-        const x = Matrix.getRandomInt(1, this.matrixSizeX);
+        let x = Matrix.getRandomInt(1, this.matrixSizeX);
         let y = Matrix.getRandomInt(1, this.matrixSizeY);
 
-        let div = Matrix.getDiv(x, y);
-        if (div.style.backgroundColor === 'red' || div.style.backgroundColor === 'black' || div.style.backgroundColor === 'rgb(228, 215, 229)') {
+        if (Matrix.hasDivColor(y, x, 'player') || Matrix.hasDivColor(y, x, 'finish') || Matrix.hasDivColor(y, x, 'wall')) {
             this.setWallSquare();
         } else {
-            div.style.backgroundColor = '#e4d7e5';
+            Matrix.setDivColor(y, x, 'wall');
         }
     }
 
@@ -102,54 +97,57 @@ class Matrix {
     }
 
     squareMove() {
-        let div = Matrix.getDiv(this.squarePositionY, this.squarePositionX);
 
-        div.style.backgroundColor = null;
+        function removeDivClass (y, x, className) {
+            $('#row' + y + 'Column' + x).removeClass(className);
+        }
+
+        removeDivClass(this.squarePositionY, this.squarePositionX,'player');
 
         this.moveOnAxisX? (this.moveOnAxisValueUp? this.squarePositionX++ : this.squarePositionX--):(this.moveOnAxisValueUp? this.squarePositionY++ : this.squarePositionY--);
 
-        div = Matrix.getDiv(this.squarePositionY, this.squarePositionX);
-
-        if (div.style.backgroundColor === 'red') {
+        if (Matrix.hasDivColor(this.squarePositionY, this.squarePositionX, 'finish')) {
+            removeDivClass(this.squarePositionY,this.squarePositionX,'finish');
             this.endGame();
         }
-        if (div.style.backgroundColor === 'rgb(228, 215, 229)') {
+        if (Matrix.hasDivColor(this.squarePositionY, this.squarePositionX, 'wall')) {
+            removeDivClass(this.squarePositionY, this.squarePositionX,'wall');
             this.endGame(true);
         }
 
-        div.style.backgroundColor = 'black';
+        Matrix.setDivColor(this.squarePositionY, this.squarePositionX, 'player');
 
     }
 
     endGame(crashed) {
+
         setTimeout(function() {
             if (crashed) {
-                alert("Вы впечатались в стену :(");
-                window.document.location.reload(true);
+                $('#h1').html('Вы врезались в стену :(');
+                /*window.document.location.reload(true);*/
+                this.play(true);
             } else {
                 this.score++;
                 this.setFinishSquare();
                 this.setWallSquare();
-                let div = document.getElementById('h1');
-                div.innerHTML = 'Квадратов поймано: ' + this.score;
+                $('#h1').html('Квадратов поймано: ' + this.score);
             }
 
         }.bind(this), 50);
     }
 
-    play() {
+    play(stop) {
         window.onkeydown = function(){
             this.directionCheck();
         }.bind(this);
 
-        setInterval(() => this.squareMove(), 150);
+        let timerId
+
+        if(stop) {
+            clearInterval(timerId);
+        } else {
+            timerId = setInterval(() => this.squareMove(), 150);
+        }
+
     }
 }
-
-window.onload = function() {
-    let m1 = new Matrix(18, 18);
-    m1.buldMatrix();
-    m1.setPlayerSquare();
-    m1.setFinishSquare();
-    m1.play();
-};
