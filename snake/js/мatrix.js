@@ -8,6 +8,7 @@ class Matrix {
         this.score = 0;
         this.moveOnAxisX = true;
         this.moveOnAxisValueUp = true;
+        this.timerId;
     }
 
     buldMatrix() {
@@ -19,7 +20,7 @@ class Matrix {
             }
             body += (column + "</br>");
         }
-        document.body.innerHTML = '<h1 id="h1">Поймайте красный квадрат</h1><article id="article">' + body + '</article>';
+        $('body').html($('body').html() + '<h1 id="h1">Поймайте красный квадрат</h1><article id="article">' + body + '</article>');
 
         $('#article').css({width: (34 * this.matrixSizeX) + 'px'});
 
@@ -136,18 +137,16 @@ class Matrix {
         }.bind(this), 50);
     }
 
-    play(stop) {
+    play(stopInterval) {
+
         window.onkeydown = function(){
             this.directionCheck();
         }.bind(this);
 
-        let timerId
-
-        if(stop) {
-            clearInterval(timerId);
+        if (stopInterval) {
+            clearInterval(this.timerId);
         } else {
-            timerId = setInterval(() => this.squareMove(), 150);
+            this.timerId = setInterval(() => this.squareMove(), 150);
         }
-
     }
 }
