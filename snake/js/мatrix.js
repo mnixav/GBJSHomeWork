@@ -8,7 +8,8 @@ class Matrix {
         this.score = 0;
         this.moveOnAxisX = true;
         this.moveOnAxisValueUp = true;
-        this.timerId;
+        this.timerId = null;
+        this.login = "";
     }
 
     buldMatrix() {
@@ -16,7 +17,7 @@ class Matrix {
         for (let i = 1; i <= this.matrixSizeY; i++) {
             let column = "";
             for (let j = 1; j <= this.matrixSizeX; j++) {
-                column += '<div id="row' + i +'Column' + j +'"></div>';
+                column += '<div id="row' + i +'Column' + j +'" class="martixSquare" ></div>';
             }
             body += (column + "</br>");
         }
@@ -139,9 +140,9 @@ class Matrix {
 
     play(stopInterval) {
 
-        window.onkeydown = function(){
+        $('window').keydown(function(){
             this.directionCheck();
-        }.bind(this);
+        }.bind(this));
 
         if (stopInterval) {
             clearInterval(this.timerId);

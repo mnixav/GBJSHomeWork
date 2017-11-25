@@ -7,9 +7,26 @@
     <script language="JavaScript" src="js/jquery-3.2.1.js"></script>
     <script language="JavaScript" src="js/snakegame.js"></script>
     <script language="JavaScript" src="js/мatrix.js"></script>
+    <script language="JavaScript" src="js/interface.js"></script>
 
 </head>
 <body>
 
+    <div id="form">
+        <h2>Добро пожаловать в игру... <br /> ...игру без названия...</h2>
+        <form>
+            <p>Введите ваше имя</p>
+            <input type="text" id="login" />
+        </form>
+        <form>
+            <p>Выберите сложность</p>
+            <label for="easy">Легко</label>
+            <input type=radio id="easy" name="difficulty">
+            <label for="normal">Нормально</label>
+            <input type=radio id="normal" name="difficulty" checked="checked">
+            <label for="hard">Сложно</label>
+            <input type=radio id="hard" name="difficulty">
+        </form>
+    </div>
 </body>
 </html>
