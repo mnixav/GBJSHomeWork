@@ -1,18 +1,20 @@
 class Matrix {
 
-    constructor (matrixSizeX, matrixSizeY)  {
-        this.matrixSizeX = matrixSizeX;
-        this.matrixSizeY = matrixSizeY;
-        this.squarePositionX = Matrix.getRandomInt(2, matrixSizeX / 2);
-        this.squarePositionY = Matrix.getRandomInt(2, matrixSizeY - 1);
+    constructor ()  {
+        this.matrixSizeX = 20;
+        this.matrixSizeY = 15;
+        this.difficulty = 0;
+        this.squarePositionX = 0;
+        this.squarePositionY = 0;
         this.score = 0;
         this.moveOnAxisX = true;
         this.moveOnAxisValueUp = true;
         this.timerId = null;
         this.login = "";
+        this.record = 0;
     }
 
-    buldMatrix() {
+    buldMatrix(firstPlay) {
         let body = "";
         for (let i = 1; i <= this.matrixSizeY; i++) {
             let column = "";
@@ -21,9 +23,10 @@ class Matrix {
             }
             body += (column + "</br>");
         }
-        $('body').html($('body').html() + '<h1 id="h1">Поймайте красный квадрат</h1><article id="article">' + body + '</article>');
+        $('.matrixDiv').html(body);
+        $('.dynamicWidth').css({width: (34 * this.matrixSizeX) + 'px'});
+        $('#buttons').css({width: $('#sidebar').css('width')});
 
-        $('#article').css({width: (34 * this.matrixSizeX) + 'px'});
 
         const self = this;
 
@@ -38,6 +41,8 @@ class Matrix {
         drawWall(1, 1, true);
         drawWall(this.matrixSizeY, 1, false);
         drawWall(1, this.matrixSizeX, true);
+
+        firstPlay? $('article').hide(): {};
     }
 
     static getRandomInt(min, max) {
@@ -53,6 +58,8 @@ class Matrix {
     }
 
     setPlayerSquare() {
+        this.squarePositionX = Matrix.getRandomInt(2, this.matrixSizeX / 2);
+        this.squarePositionY = Matrix.getRandomInt(2, this.matrixSizeY - 1);
         Matrix.setDivColor(this.squarePositionY, this.squarePositionX, 'player');
     }
 
@@ -75,7 +82,11 @@ class Matrix {
         if (Matrix.hasDivColor(y, x, 'player') || Matrix.hasDivColor(y, x, 'finish') || Matrix.hasDivColor(y, x, 'wall')) {
             this.setWallSquare();
         } else {
-            Matrix.setDivColor(y, x, 'wall');
+            Matrix.setDivColor(y, x, 'preWall');
+            setTimeout(() => {
+                Matrix.setDivColor(y, x, 'wall');
+                Matrix.removeDivClass(y, x,'preWall');
+            }, 500)
         }
     }
 
@@ -98,23 +109,26 @@ class Matrix {
         }
     }
 
+    static removeDivClass (y, x, className) {
+        $('#row' + y + 'Column' + x).removeClass(className);
+    }
+
     squareMove() {
 
-        function removeDivClass (y, x, className) {
-            $('#row' + y + 'Column' + x).removeClass(className);
-        }
-
-        removeDivClass(this.squarePositionY, this.squarePositionX,'player');
+        Matrix.removeDivClass(this.squarePositionY, this.squarePositionX,'player');
 
         this.moveOnAxisX? (this.moveOnAxisValueUp? this.squarePositionX++ : this.squarePositionX--):(this.moveOnAxisValueUp? this.squarePositionY++ : this.squarePositionY--);
 
         if (Matrix.hasDivColor(this.squarePositionY, this.squarePositionX, 'finish')) {
-            removeDivClass(this.squarePositionY,this.squarePositionX,'finish');
+            Matrix.removeDivClass(this.squarePositionY,this.squarePositionX,'finish');
             this.endGame();
         }
         if (Matrix.hasDivColor(this.squarePositionY, this.squarePositionX, 'wall')) {
-            removeDivClass(this.squarePositionY, this.squarePositionX,'wall');
+            Matrix.removeDivClass(this.squarePositionY, this.squarePositionX,'wall');
             this.endGame(true);
+        }
+        if (Matrix.hasDivColor(this.squarePositionY, this.squarePositionX, 'preWall')) {
+            Matrix.removeDivClass(this.squarePositionY, this.squarePositionX,'preWall');
         }
 
         Matrix.setDivColor(this.squarePositionY, this.squarePositionX, 'player');
@@ -125,29 +139,32 @@ class Matrix {
 
         setTimeout(function() {
             if (crashed) {
-                $('#h1').html('Вы врезались в стену :(');
-                /*window.document.location.reload(true);*/
+                $('#h1').html('Вы врезались в стену. Попробуйте заново :(');
                 this.play(true);
+                $('#reload').focus();
             } else {
                 this.score++;
                 this.setFinishSquare();
                 this.setWallSquare();
                 $('#h1').html('Квадратов поймано: ' + this.score);
+                if (this.record < this.score) {this.record = this.score}
+                $('#record').html('Ваш рекорд: ' + this.record);
             }
 
-        }.bind(this), 50);
+        }.bind(this), 20);
     }
 
     play(stopInterval) {
 
-        $('window').keydown(function(){
+        $('body').keydown(function(){
             this.directionCheck();
         }.bind(this));
 
         if (stopInterval) {
             clearInterval(this.timerId);
+            this.score = 0;
         } else {
-            this.timerId = setInterval(() => this.squareMove(), 150);
+            this.timerId = setInterval(() => this.squareMove(), this.difficulty);
         }
     }
 }

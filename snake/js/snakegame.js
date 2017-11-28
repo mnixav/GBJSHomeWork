@@ -1,10 +1,10 @@
 
 window.onload = function() {
-    let initerface = new Interface()
-    var inputData = initerface.getInputOfInitialData()
-    let m1 = new Matrix(18, 18,);
-    /*m1.buldMatrix();
+    let initerface = new Interface();
+    let m1 = new Matrix();
+    m1.buldMatrix(true);
+    initerface.getInputOfInitialData(m1);
     m1.setPlayerSquare();
     m1.setFinishSquare();
-    m1.play();*/
+    /*setTimeout(m1.play, 3000);*/
 };

@@ -11,22 +11,36 @@
 
 </head>
 <body>
-
     <div id="form">
         <h2>Добро пожаловать в игру... <br /> ...игру без названия...</h2>
-        <form>
-            <p>Введите ваше имя</p>
-            <input type="text" id="login" />
-        </form>
-        <form>
+
+            <p id="writeYourName">Введите ваше имя</p>
+            <input type="text" id="login">
             <p>Выберите сложность</p>
-            <label for="easy">Легко</label>
             <input type=radio id="easy" name="difficulty">
-            <label for="normal">Нормально</label>
+            <label for="easy">Легко</label>
             <input type=radio id="normal" name="difficulty" checked="checked">
-            <label for="hard">Сложно</label>
+            <label for="normal">Нормально</label>
             <input type=radio id="hard" name="difficulty">
-        </form>
+            <label for="hard">Сложно</label><br/>
+            <button id="submit">Начать</button>
+
     </div>
+   <article>
+       <div id="sidebar" class="inlineBlock">
+           <div>
+               <h3 id="playerName"></h3>
+               <p id="record">Ваш рекорд: 0</p>
+           </div>
+       </div>
+       <div class="inlineBlock">
+           <h1 id="h1" class="dynamicWidth">Поймайте красный квадрат, используя стрелки клавиатуры</h1>
+           <div class="dynamicWidth matrixDiv"></div>
+       </div>
+       <div id="buttons" class="inlineBlock">
+           <button id="setting">Настройки</button><br />
+           <button id="reload">Заново</button>
+       </div>
+   </article>
 </body>
 </html>
